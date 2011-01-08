@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package Term::ExtendedColor::Xresources;
 
-our $VERSION  = '0.001';
+our $VERSION  = '0.002';
 
 require Exporter;
 @ISA = 'Exporter';
@@ -70,17 +70,17 @@ sub set_xterm_color {
   my $color = shift; # ff0000
 
   if(!defined($index) or ($index eq '')) {
-    confess("Need index color (0..255)");
+    croak("Need index color (0..255)");
   }
   if(!defined($color) or ($color eq '')) {
-  confess("Need color specification in valid hex");
+  croak("Need color specification in valid hex");
   }
 
   if(($index < 0) or ($index > 255)) {
-    confess("Invalid index: $index. Valid numbers are 0-255\n");
+    croak("Invalid index: $index. Valid numbers are 0-255\n");
   }
   if($color !~ /^([A-Fa-f0-9]{6}$)/) {
-    confess("Invalid hex: $color\n");
+    croak("Invalid hex: $color\n");
   }
 
   my($r_hex, $g_hex, $b_hex) = $color =~ /(..)(..)(..)/g;
