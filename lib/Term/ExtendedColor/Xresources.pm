@@ -1,22 +1,31 @@
 #!/usr/bin/perl
 package Term::ExtendedColor::Xresources;
 
-our $VERSION  = '0.002';
+our $VERSION  = '0.030';
 
 require Exporter;
 @ISA = 'Exporter';
-our @EXPORT = qw(set_xterm_color get_xterm_colors);
+our @EXPORT_OK = qw(
+  set_xterm_color
+  get_xterm_color
+  get_xterm_colors
+);
 
 use strict;
 use Carp 'croak';
 use Term::ReadKey;
 
-sub get_xterm_colors {
-  my $index = shift;
+# Convience function for get_xterm_colors
+sub get_xterm_color {
+  get_xterm_colors(@_);
+}
 
-  if( (not defined($index)) and (ref($index) eq '') ) {
-    $index = [0 .. 255];
-  }
+sub get_xterm_colors {
+  my $arg = shift;
+
+  my $index = $arg->{index} || [0 .. 255];
+  #exists($arg->{type}) or $arg->{type} = 'dec';
+
 
   my @indexes;
 
@@ -34,7 +43,7 @@ sub get_xterm_colors {
     croak("Index must be a value within 0 .. 255, inclusive\n");
   }
 
-  open(my $tty, '<', '/dev/tty') or croak("Can not open /dev/tty: $!");
+  open(my $tty, '<', '/dev/tty') or croak("Can not open /dev/tty: $!\n");
 
   my $colors;
   for my $i(@indexes) {
@@ -56,37 +65,55 @@ sub get_xterm_colors {
            ([A-Za-z0-9]{2})
        }x;
 
-    $colors->{$i}->{red}   = $r;
-    $colors->{$i}->{green} = $g;
-    $colors->{$i}->{blue}  = $b;
-    $colors->{$i}->{rgb}   = "$r$g$b";
+    $colors->{$i}->{raw} = $response;
+    # Return in base 10 by default
+    if($arg->{type} eq 'hex') {
+      $colors->{$i}->{red}   = $r; # ff
+      $colors->{$i}->{green} = $g;
+      $colors->{$i}->{blue}  = $b;
+      $colors->{$i}->{rgb}   = "$r$g$b";
+    }
+    else {
+      ($r, $g, $b) = (hex($r), hex($g), hex($b));
 
+      $colors->{$i}->{red}   = $r; # 255
+      $colors->{$i}->{green} = $g;
+      $colors->{$i}->{blue}  = $b;
+      $colors->{$i}->{rgb}   = "$r/$g/$b"; # 255/255/0
+    }
   }
   return $colors;
 }
 
 sub set_xterm_color {
-  my $index = shift; # color no 8
-  my $color = shift; # ff0000
+  my $old_colors = shift;
 
-  if(!defined($index) or ($index eq '')) {
-    croak("Need index color (0..255)");
-  }
-  if(!defined($color) or ($color eq '')) {
-  croak("Need color specification in valid hex");
+  if(ref($old_colors) ne 'HASH') {
+    croak("Hash reference expected");
   }
 
-  if(($index < 0) or ($index > 255)) {
-    croak("Invalid index: $index. Valid numbers are 0-255\n");
-  }
-  if($color !~ /^([A-Fa-f0-9]{6}$)/) {
-    croak("Invalid hex: $color\n");
+  my %new_colors;
+
+  for my $index(keys(%{$old_colors})) {
+
+    if( ($index < 0) or ($index > 255) ) {
+      next;
+    }
+    if($old_colors->{$index} !~ /^[A-Fa-f0-9]{6}$/) { # Allow stuff like fff ?
+      next;
+    }
+
+    my($r, $g, $b) = $old_colors->{$index} =~ m/(..)(..)(..)/;
+    $new_colors{$index} = "\e]4;$index;rgb:$r/$g/$b\e\\";
   }
 
-  my($r_hex, $g_hex, $b_hex) = $color =~ /(..)(..)(..)/g;
-  return("\e]4;$index;rgb:$r_hex/$g_hex/$b_hex\e\\");
+  return \%new_colors;
 }
 
+
+1;
+
+__END__
 
 =pod
 
@@ -96,59 +123,77 @@ Term::ExtendedColor::Xresources - Query and set various Xresources
 
 =head1 SYNOPSIS
 
-    use Term::ExtendedColor::Xresources;
+    use Term::ExtendedColor::Xresources qw(get_xterm_color set_xterm_color);
 
     # Get RGB values for all defined colors
-    my $colors = get_xterm_colors( [0 .. 255] );
+    my $colors = get_xterm_color({
+      index => [0 .. 255], # default
+      type  => 'hex',      # default is base 10
+    });
+
 
 =head1 DESCRIPTION
 
-Term::ExtendedColor::Xresources provides functions for changing and querying the
-underlying terminal for various X resources.
+B<Term::ExtendedColor::Xresources> provides functions for changing and querying
+the underlying X terminal emulator for various X resources.
 
 =head1 EXPORTS
 
+None by default.
+
+=head1 FUNCTIONS
+
 =head2 set_xterm_color()
 
-Parameters: $index, $color
+  # Switch yellow and red
+  my $new_colors = set_xterm_color({
+    220 => 'ff0000',
+    196 => 'ffff00',
+  });
 
-Returns:    $string
+  print $_ for values %{$new_colors};
 
-  # Change color index 220 from ffff00 to ff0000
-  my $color = set_xterm_color(220, 'ff0000');
-  print $color;
+Expects a hash reference where the keys are color indexes (0 .. 255) and the
+values hexadecimal representations of the color values.
 
-=head2 get_xterm_colors()
+Returns a hash with the indexes as keys and the appropriate escape sequences as
+values.
 
-Parameters: $index | \@indexes
+=head2 get_xterm_color()
 
-Returns:    \%colors
+  my $defined_colors = get_xterm_color( [ 0 .. 16 ] );
 
-  my $defined_colors = get_xterm_colors( [ 0 .. 16 ] );
   print $defined_colors->{4}->{red}, "\n";
   print $defined_colors->{8}->{rgb}, "\n";
 
-Returns a hash reference containing RGB values of the defined colors.
-If omitting any parameters, defaults to all colors, 0 .. 255.
+Expects an array reference with color indexes to operate on.
+B<0 - 15> is the standard I<ANSI> colors, all above are extended colors.
 
-  10 => {
-    red   => "b0",
-    green => "3b",
-    blue  => "31",
-    rgb   => "b03b31",
-  },
+Returns a hash reference with the the index colors as keys.
+By default the color values are in decimal.
 
-  11 => {
-    red   => "bd",
-    green => "f1",
-    blue  => "3d",
-    rgb   => "bdf13d",
-  },
+The color values can be accessed by using their name:
 
+  my $red = $colors->{10}->{red};
+
+Or by using the short notation:
+
+  my $red = $colors->{10}->{r};
+
+The full color string can be retrieved like so:
+
+  my $rgb = $colors->{10}->{rgb};
+
+The C<raw> element is the full response from the terminal, including escape
+sequences.
+
+=head2 get_xterm_colors()
+
+The same thing as B<get_xterm_color()>. Will be deprecated.
 
 =head1 SEE ALSO
 
-Term::ExtendedColor
+L<Term::ExtendedColor>
 
 =head1 AUTHOR
 
@@ -161,10 +206,8 @@ Written by Magnus Woldrich
 
 =head1 COPYRIGHT
 
-Copyright 2010 Magnus Woldrich <magnus@trapd00r.se>. This program is free
+Copyright 2010, 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is free
 software; you may redistribute it and/or modify it under the same terms as
 Perl itself.
 
 =cut
-
-1;
