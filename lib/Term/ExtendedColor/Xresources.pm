@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 package Term::ExtendedColor::Xresources;
 
-our $VERSION  = '0.030';
+our $VERSION  = '0.034';
 
 require Exporter;
 @ISA = 'Exporter';
@@ -24,7 +24,6 @@ sub get_xterm_colors {
   my $arg = shift;
 
   my $index = $arg->{index} || [0 .. 255];
-  #exists($arg->{type}) or $arg->{type} = 'dec';
 
 
   my @indexes;
@@ -34,9 +33,6 @@ sub get_xterm_colors {
   }
   elsif(ref($index) eq '') {
     push(@indexes, $index);
-  }
-  else {
-    croak("Reference type " . ref($index) . " not supported\n");
   }
 
   if( grep { $_ < 0 } @indexes ) {
@@ -161,12 +157,11 @@ values.
 
 =head2 get_xterm_color()
 
-  my $defined_colors = get_xterm_color( [ 0 .. 16 ] );
+  my $defined_colors = get_xterm_color({ index => [0 .. 255] });
 
   print $defined_colors->{4}->{red}, "\n";
   print $defined_colors->{8}->{rgb}, "\n";
 
-Expects an array reference with color indexes to operate on.
 B<0 - 15> is the standard I<ANSI> colors, all above are extended colors.
 
 Returns a hash reference with the the index colors as keys.
