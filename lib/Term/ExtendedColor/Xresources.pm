@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 package Term::ExtendedColor::Xresources;
-
-our $VERSION  = '0.034';
-
-require Exporter;
-@ISA = 'Exporter';
-our @EXPORT_OK = qw(
-  set_xterm_color
-  get_xterm_color
-  get_xterm_colors
-);
-
 use strict;
-use Carp 'croak';
+
+BEGIN {
+  use Exporter;
+  use vars qw($VERSION @ISA @EXPORT_OK);
+
+  $VERSION = '0.041';
+  @ISA     = qw(Exporter);
+  @EXPORT_OK = qw(
+    set_xterm_color
+    get_xterm_color
+    get_xterm_colors
+  );
+}
+use Carp qw(croak);
 use Term::ReadKey;
 
 # Convience function for get_xterm_colors
@@ -197,12 +199,18 @@ L<Term::ExtendedColor>
   magnus@trapd00r.se
   http://japh.se
 
-Written by Magnus Woldrich
+=head1 CONTRIBUTORS
+
+None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is free
-software; you may redistribute it and/or modify it under the same terms as
-Perl itself.
+Copyright 2010, 2011 the Term::ExtendedColor::Xresources L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut
