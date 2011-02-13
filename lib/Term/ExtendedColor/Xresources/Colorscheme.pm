@@ -6,13 +6,15 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.002';
+  $VERSION = '0.003';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
-    set_colorscheme
+    get_colorscheme
     get_colorschemes
   );
 }
+
+use Term::ExtendedColor::Xresources qw(set_xterm_color);
 
 my %colorschemes = (
   xterm     => {

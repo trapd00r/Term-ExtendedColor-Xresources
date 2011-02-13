@@ -1,4 +1,5 @@
 bin/set_single_color
+bin/xcolor
 lib/Term/ExtendedColor/Xresources.pm
 lib/Term/ExtendedColor/Xresources/Colorscheme.pm
 Makefile.PL
