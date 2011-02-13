@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.042';
+  $VERSION = '0.050';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
@@ -18,15 +18,12 @@ use Carp qw(croak);
 use Term::ReadKey;
 
 # Convience function for get_xterm_colors
-sub get_xterm_color {
-  get_xterm_colors(@_);
-}
+*get_xterm_color = *get_xterm_colors;
 
 sub get_xterm_colors {
   my $arg = shift;
 
-  my $index = $arg->{index} || [0 .. 255];
-
+  my $index = (exists($arg->{index})) ? $arg->{index} :  [0 .. 255];
 
   my @indexes;
 
