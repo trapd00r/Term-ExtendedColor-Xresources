@@ -5,40 +5,39 @@ use ExtUtils::MakeMaker;
 WriteMakefile1(
     META_MERGE => {
         resources => {
-				repository => 'https://github.com/trapd00r/Term-ExtendedColor-Xresources',
-        bugtracker => 'https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues',
+            repository => q{https://github.com/trapd00r/Term-ExtendedColor-Xresources},
+            bugtracker => q{https://github.com/trapd00r/Term-ExtendedColor-Xresources/issues},
         },
     },
     #BUILD_REQUIRES => {
     #},
 
-    NAME                => 'Term::ExtendedColor::Xresources',
-    AUTHOR              => q{Magnus Woldrich <trapd00r@trapd00r.se>},
-    ABSTRACT           => 'Query and set various X resources',
-    VERSION_FROM        => 'lib/Term/ExtendedColor/Xresources.pm',
-    'LICENSE'           => 'perl',
-    PL_FILES            => {},
-    EXE_FILES =>           [
-      'bin/set_single_color',
-    ],
+    NAME              => q{Term::ExtendedColor::Xresources},
+    AUTHOR            => q{Magnus Woldrich <trapd00r@trapd00r.se>},
+    ABSTRACT          => q{Get, set and modify X resources},
+    VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
+    LICENSE           => q{perl},
+    EXE_FILES         => [ q{./bin/set_single_color} ],
     PREREQ_PM => {
-      'Test::More'      => 0,
-      'Term::ReadKey'   => 0,
+      q{Term::ReadKey}       => 0,
+      q{Test::More}          => 0,
     },
     MAN1PODS            => {
-      'bin/set_single_color'        => 'blib/man1/set_single_color.1',
-      },
-    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean               => { FILES => 'Term-ExtendedColor-Xresources*' },
+      q{./bin/set_single_color} => q{blib/man1/set_single_color.1},
+    },
+
+    MAN3PODS            => { },
+    dist                => { COMPRESS => q{gzip -9f}, SUFFIX => q{gz}, },
+    clean               => { FILES    => q{Term-ExtendedColor-Xresources-*} },
 );
 
 sub WriteMakefile1 {
-    my %params=@_;
-    my $eumm_version=$ExtUtils::MakeMaker::VERSION;
-    $eumm_version=eval $eumm_version;
+    my %params = @_;
+    my $eumm_version = $ExtUtils::MakeMaker::VERSION;
+    $eumm_version = eval $eumm_version;
     die "EXTRA_META is deprecated" if exists $params{EXTRA_META};
     die "License not specified" if not exists $params{LICENSE};
-    if ($params{AUTHOR} and ref($params{AUTHOR}) eq 'ARRAY'
+    if ($params{AUTHOR} and ref($params{AUTHOR}) eq q{ARRAY}
         and $eumm_version < 6.5705) {
           $params{META_ADD}->{author}=$params{AUTHOR};
           $params{AUTHOR}=join(', ',@{$params{AUTHOR}});
@@ -51,13 +50,17 @@ sub WriteMakefile1 {
         delete $params{BUILD_REQUIRES};
     }
     delete $params{CONFIGURE_REQUIRES} if $eumm_version < 6.52;
-    delete $params{MIN_PERL_VERSION} if $eumm_version < 6.48;
-    delete $params{META_MERGE} if $eumm_version < 6.46;
-    delete $params{META_ADD} if $eumm_version < 6.46;
-    delete $params{LICENSE} if $eumm_version < 6.31;
-    delete $params{AUTHOR} if $] < 5.005;
-    delete $params{ABSTRACT_FROM} if $] < 5.005;
-    delete $params{BINARY_LOCATION} if $] < 5.005;
+    delete $params{MIN_PERL_VERSION}   if $eumm_version < 6.48;
+    delete $params{META_MERGE}         if $eumm_version < 6.46;
+    delete $params{META_ADD}           if $eumm_version < 6.46;
+    delete $params{LICENSE}            if $eumm_version < 6.31;
+    delete $params{AUTHOR}             if $] < 5.005;
+    delete $params{ABSTRACT_FROM}      if $] < 5.005;
+    delete $params{BINARY_LOCATION}    if $] < 5.005;
+
+    delete $params{MAN3PODS}->{'README.pod'};
 
     WriteMakefile(%params);
 }
+
+

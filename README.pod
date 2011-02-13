@@ -1,0 +1,101 @@
+=pod
+
+=head1 NAME
+
+Term::ExtendedColor::Xresources - Query and set various Xresources
+
+=head1 SYNOPSIS
+
+    use Term::ExtendedColor::Xresources qw(get_xterm_color set_xterm_color);
+
+    # Get RGB values for all defined colors
+    my $colors = get_xterm_color({
+      index => [0 .. 255], # default
+      type  => 'hex',      # default is base 10
+    });
+
+
+=head1 DESCRIPTION
+
+B<Term::ExtendedColor::Xresources> provides functions for changing and querying
+the underlying X terminal emulator for various X resources.
+
+=head1 EXPORTS
+
+None by default.
+
+=head1 FUNCTIONS
+
+=head2 set_xterm_color()
+
+  # Switch yellow and red
+  my $new_colors = set_xterm_color({
+    220 => 'ff0000',
+    196 => 'ffff00',
+  });
+
+  print $_ for values %{$new_colors};
+
+Expects a hash reference where the keys are color indexes (0 .. 255) and the
+values hexadecimal representations of the color values.
+
+Returns a hash with the indexes as keys and the appropriate escape sequences as
+values.
+
+=head2 get_xterm_color()
+
+  my $defined_colors = get_xterm_color({ index => [0 .. 255] });
+
+  print $defined_colors->{4}->{red}, "\n";
+  print $defined_colors->{8}->{rgb}, "\n";
+
+B<0 - 15> is the standard I<ANSI> colors, all above are extended colors.
+
+Returns a hash reference with the the index colors as keys.
+By default the color values are in decimal.
+
+The color values can be accessed by using their name:
+
+  my $red = $colors->{10}->{red};
+
+Or by using the short notation:
+
+  my $red = $colors->{10}->{r};
+
+The full color string can be retrieved like so:
+
+  my $rgb = $colors->{10}->{rgb};
+
+The C<raw> element is the full response from the terminal, including escape
+sequences.
+
+=head2 get_xterm_colors()
+
+The same thing as B<get_xterm_color()>. Will be deprecated.
+
+=head1 SEE ALSO
+
+L<Term::ExtendedColor>
+
+=head1 AUTHOR
+
+  Magnus Woldrich
+  CPAN ID: WOLDRICH
+  magnus@trapd00r.se
+  http://japh.se
+
+=head1 CONTRIBUTORS
+
+None required yet.
+
+=head1 COPYRIGHT
+
+Copyright 2010, 2011 the Term::ExtendedColor::Xresources L</AUTHOR> and
+L</CONTRIBUTORS> as listed above.
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
