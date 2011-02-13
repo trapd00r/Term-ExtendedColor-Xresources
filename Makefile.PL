@@ -17,13 +17,14 @@ WriteMakefile1(
     ABSTRACT          => q{Get, set and modify X resources},
     VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
     LICENSE           => q{perl},
-    EXE_FILES         => [ q{./bin/set_single_color} ],
+    EXE_FILES         => [ q{./bin/set_single_color}, q{./bin/xcolor} ],
     PREREQ_PM => {
       q{Term::ReadKey}       => 0,
       q{Test::More}          => 0,
     },
     MAN1PODS            => {
       q{./bin/set_single_color} => q{blib/man1/set_single_color.1},
+      q{./bin/xcolor}           => q{blib/man1/xcolor.1},
     },
 
     MAN3PODS            => { },
