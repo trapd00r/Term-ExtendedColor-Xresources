@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.052';
+  $VERSION = '0.054';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
@@ -81,6 +81,7 @@ sub get_xterm_colors {
 }
 
 sub set_xterm_color {
+  # color => index
   my $old_colors = shift;
 
   if(ref($old_colors) ne 'HASH') {
@@ -89,19 +90,18 @@ sub set_xterm_color {
 
   my %new_colors;
 
-  for my $index(keys(%{$old_colors})) {
-
+  for my $index(keys(%{ $old_colors })) {
     if( ($index < 0) or ($index > 255) ) {
       next;
     }
-    if($old_colors->{$index} !~ /^[A-Fa-f0-9]{6}$/) { # Allow stuff like fff ?
+    if($old_colors->{$index} !~ /^[A-Fa-f0-9]{6}$/) {
       next;
     }
 
-    my($r, $g, $b) = $old_colors->{$index} =~ m/(..)(..)(..)/;
-    $new_colors{$index} = "\e]4;$index;rgb:$r/$g/$b\e\\";
-  }
+    my($r, $g, $b) = $old_colors->{$index} =~ m/(..)/g;
 
+    $new_colors{ $index } = "\e]4;$index;rgb:$r/$g/$b\e\\"
+  }
   return \%new_colors;
 }
 
