@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.003';
+  $VERSION = '0.004';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     get_colorscheme
@@ -699,7 +699,7 @@ my %colorschemes = (
 
 
 sub get_colorscheme {
-  my $name = shift // 'xterm';
+  my $name = shift || 'xterm';
 
   my $res  = set_xterm_color( $colorschemes{$name} );
 
