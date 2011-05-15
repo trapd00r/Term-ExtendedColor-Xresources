@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.056';
+  $VERSION = '0.060';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
@@ -100,9 +100,29 @@ sub set_xterm_color {
 
     my($r, $g, $b) = $old_colors->{$index} =~ m/(..)/g;
 
-    $new_colors{ $index } = "\e]4;$index;rgb:$r/$g/$b\e\\"
+
+    my $term = $ENV{TERM};
+
+    # This is for GNU Screen and Tmux
+    # Tmux identifies itself as GNU Screen
+    # "\eP\e]4;198;rgb:50/20/40\a\e\\"
+
+    # echo -e "\033]12;green\007" should change the cursor color, but inside of
+    #  screen, you have to wrap all that with "\eP" and "\a\e\\"
+
+    if($term =~ m/^screen/) {
+      $new_colors{ $index } = "\eP\e]4;$index;rgb:$r/$g/$b\a\e\\";
+    }
+    else {
+      $new_colors{ $index } = "\e]4;$index;rgb:$r/$g/$b\e\\"
+    }
   }
-  return \%new_colors;
+  if(!defined( wantarray() )) {
+    print for values %new_colors;
+  }
+  else {
+    return \%new_colors;
+  }
 }
 
 
@@ -119,6 +139,9 @@ Term::ExtendedColor::Xresources - Query and set various Xresources
 =head1 SYNOPSIS
 
     use Term::ExtendedColor::Xresources qw(get_xterm_color set_xterm_color);
+
+    # make color index 220 represent red instead of yellow
+    set_xterm_color({ 220 => 'ff0000'});
 
     # Get RGB values for all defined colors
     my $colors = get_xterm_color({
@@ -148,11 +171,15 @@ None by default.
 
   print $_ for values %{$new_colors};
 
+  # or just...
+
+  set_xterm_color({ 100 => ff0066});
+
 Expects a hash reference where the keys are color indexes (0 .. 255) and the
 values hexadecimal representations of the color values.
 
-Returns a hash with the indexes as keys and the appropriate escape sequences as
-values.
+Changes the colors if called in void context. Else, returns a hash with the
+indexes as keys and the appropriate escape sequences as values.
 
 =head2 get_xterm_color()
 
@@ -161,9 +188,9 @@ values.
   print $defined_colors->{4}->{red}, "\n";
   print $defined_colors->{8}->{rgb}, "\n";
 
-B<0 - 15> is the standard I<ANSI> colors, all above are extended colors.
+B<0 - 15> is the standard I<ANSI> colors, all above them are extended colors.
 
-Returns a hash reference with the the index colors as keys.
+Returns a hash reference with the index colors as keys.
 By default the color values are in decimal.
 
 The color values can be accessed by using their name:
@@ -178,7 +205,7 @@ The full color string can be retrieved like so:
 
   my $rgb = $colors->{10}->{rgb};
 
-The C<raw> element is the full response from the terminal, including escape
+The C<raw> element is the full, raw response from the terminal, including escape
 sequences.
 
 =head2 get_xterm_colors()
@@ -202,7 +229,7 @@ None required yet.
 
 =head1 COPYRIGHT
 
-Copyright 2010, 2011 the Term::ExtendedColor::Xresources L</AUTHOR> and
+Copyright 2010, 2011 the B<Term::ExtendedColor::Xresources> L</AUTHOR> and
 L</CONTRIBUTORS> as listed above.
 
 =head1 LICENSE
