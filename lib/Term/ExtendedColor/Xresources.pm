@@ -6,18 +6,21 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.060';
+  $VERSION = '0.070';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
     get_xterm_color
     get_xterm_colors
+
+    set_background_color
+    set_foreground_color
   );
 }
+
 use Carp qw(croak);
 use Term::ReadKey;
 
-# Convience function for get_xterm_colors
 *get_xterm_color = *get_xterm_colors;
 
 sub get_xterm_colors {
@@ -125,6 +128,33 @@ sub set_xterm_color {
   }
 }
 
+sub set_background_color {
+  my $color = shift;
+  $color =~ s/^#//g;
+
+  my $esc = "\e]11;#$color\007";
+
+  if(!defined( wantarray() )) {
+    print $esc;
+  }
+  else {
+    return $esc;
+  }
+}
+
+sub set_foreground_color {
+  my $color = shift;
+  $color =~ s/^#//g;
+
+  my $esc = "\e]10;#$color\007";
+
+  if(!defined( wantarray() )) {
+    print $esc;
+  }
+  else {
+    return $esc;
+  }
+}
 
 1;
 
@@ -138,17 +168,27 @@ Term::ExtendedColor::Xresources - Query and set various Xresources
 
 =head1 SYNOPSIS
 
-    use Term::ExtendedColor::Xresources qw(get_xterm_color set_xterm_color);
+    use Term::ExtendedColor::Xresources qw(
+      get_xterm_color
+      set_xterm_color
+      set_foreground_color
+      set_background_color
+    );
 
     # make color index 220 represent red instead of yellow
     set_xterm_color({ 220 => 'ff0000'});
 
-    # Get RGB values for all defined colors
+    # get RGB values for all defined colors
     my $colors = get_xterm_color({
       index => [0 .. 255], # default
       type  => 'hex',      # default is base 10
     });
 
+    # change the background color to red...
+    set_background_color('ff0000');
+
+    # .. and the foreground color to yellow
+    set_foreground_color('ffff00');
 
 =head1 DESCRIPTION
 
@@ -211,6 +251,25 @@ sequences.
 =head2 get_xterm_colors()
 
 The same thing as B<get_xterm_color()>. Will be deprecated.
+
+=head2 set_foreground_color()
+
+  set_foreground_color('ff0000');
+
+  my $fg = set_foreground_color('c0ffee');
+
+Sets the foreground color if called in void context. Else, the appropriate
+escape sequence is returned.
+
+=head2 set_background_color()
+
+  set_background_color('121212');
+
+  my $bg = set_foreground_color('000000');
+
+Sets the foreground color if called in void context. Else, the appropriate
+escape sequence is returned.
+
 
 =head1 SEE ALSO
 
