@@ -2,13 +2,13 @@
 use strict;
 
 my $APP      = 'set_single_color';
-our $VERSION = '0.125';
+our $VERSION = '0.130';
 
 use Getopt::Long;
 use Pod::Usage;
 use Term::ExtendedColor::Xresources qw(set_xterm_color);
 
-our($index, $color) = (0, '9dff00');
+our($index, $color) = (int(rand(15)), sprintf("%06x", rand(16777215)));
 
 GetOptions(
   'i|index:i' => \$index,
