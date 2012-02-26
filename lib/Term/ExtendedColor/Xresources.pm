@@ -223,7 +223,7 @@ indexes as keys and the appropriate escape sequences as values.
 
 =head2 get_xterm_color()
 
-  my $defined_colors = get_xterm_color({ index => [0 .. 255] });
+  my $defined_colors = get_xterm_color({ index => [0 .. 255], type => 'dec' });
 
   print $defined_colors->{4}->{red}, "\n";
   print $defined_colors->{8}->{rgb}, "\n";
@@ -247,6 +247,25 @@ The full color string can be retrieved like so:
 
 The C<raw> element is the full, raw response from the terminal, including escape
 sequences.
+
+The following arguments are supported:
+
+=over
+
+=item index => $index | \@indexes
+
+Arrayref of color indexes to look up and return. Defaults to [0..255], i.e.
+all indexes. Alternately a single index may be passed.
+
+=item type => 'dec' | 'hex'
+
+May be 'dec' or 'hex'. The default is 'dec' (decimal) which returns color
+values as integers between 0 and 255, and returns a 'rgb' string of the form
+'$r/$g/$b' e.g. '255/0/0'. If 'hex' is passed, returns color values in
+ase 16, zero-padded to two characters (between 00 and ff) and a 'rgb' string
+of the form '$r$g$b' e.g. 'ff0000'
+
+=back
 
 =head2 get_xterm_colors()
 
