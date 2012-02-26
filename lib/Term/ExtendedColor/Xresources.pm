@@ -79,6 +79,10 @@ sub get_xterm_colors {
       $colors->{$i}->{blue}  = $b;
       $colors->{$i}->{rgb}   = "$r/$g/$b"; # 255/255/0
     }
+
+    $colors->{$i}{r} = $colors->{$i}{red};
+    $colors->{$i}{g} = $colors->{$i}{green};
+    $colors->{$i}{b} = $colors->{$i}{blue};
   }
   return $colors;
 }
