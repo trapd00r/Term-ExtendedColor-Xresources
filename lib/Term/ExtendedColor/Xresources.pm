@@ -52,16 +52,18 @@ sub get_xterm_colors {
     print "\e]4;$i;?\a"; # the '?' indicates a query
 
     my $response = '';
-    $response .= ReadKey(0, $tty) for(0 .. 22);
-
+    my ($r, $g, $b);
+    while(1) {
+        if ($response =~ m[ rgb: (.{4}) / (.{4}) / (.{4}) ]x) {
+            ($r, $g, $b) = map { substr $_, 0, 2 } ($1, $2, $3);
+            last;
+        }
+        else {
+            $response .= ReadKey(0, $tty);
+        }
+    }
 
     ReadMode('normal');
-
-    my($r, $g, $b) = $response =~ m{
-      rgb: ([A-Za-z0-9]{2}).*/
-           ([A-Za-z0-9]{2}).*/
-           ([A-Za-z0-9]{2})
-       }x;
 
     $colors->{$i}->{raw} = $response;
     # Return in base 10 by default
