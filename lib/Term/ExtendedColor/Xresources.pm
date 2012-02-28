@@ -6,7 +6,7 @@ BEGIN {
   use Exporter;
   use vars qw($VERSION @ISA @EXPORT_OK);
 
-  $VERSION = '0.070';
+  $VERSION = '0.072';
   @ISA     = qw(Exporter);
   @EXPORT_OK = qw(
     set_xterm_color
@@ -54,13 +54,13 @@ sub get_xterm_colors {
     my $response = '';
     my ($r, $g, $b);
     while(1) {
-        if ($response =~ m[ rgb: (.{4}) / (.{4}) / (.{4}) ]x) {
-            ($r, $g, $b) = map { substr $_, 0, 2 } ($1, $2, $3);
-            last;
-        }
-        else {
-            $response .= ReadKey(0, $tty);
-        }
+      if ($response =~ m[ rgb: (.{4}) / (.{4}) / (.{4}) ]x) {
+        ($r, $g, $b) = map { substr $_, 0, 2 } ($1, $2, $3);
+        last;
+      }
+      else {
+        $response .= ReadKey(0, $tty);
+      }
     }
 
     ReadMode('normal');
@@ -268,7 +268,7 @@ all indexes. Alternately a single index may be passed.
 May be 'dec' or 'hex'. The default is 'dec' (decimal) which returns color
 values as integers between 0 and 255, and returns a 'rgb' string of the form
 '$r/$g/$b' e.g. '255/0/0'. If 'hex' is passed, returns color values in
-ase 16, zero-padded to two characters (between 00 and ff) and a 'rgb' string
+base 16, zero-padded to two characters (between 00 and ff) and a 'rgb' string
 of the form '$r$g$b' e.g. 'ff0000'
 
 =back
