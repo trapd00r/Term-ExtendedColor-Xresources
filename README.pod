@@ -4,6 +4,12 @@
 
 Term::ExtendedColor::Xresources - Query and set various Xresources
 
+=begin HTML
+
+<p><img src="https://raw.githubusercontent.com/trapd00r/Term-ExtendedColor-Xresources/master/doc/t_e_x_rainbow.gif"/></p>
+
+=end HTML
+
 =head1 SYNOPSIS
 
     use Term::ExtendedColor::Xresources qw(
