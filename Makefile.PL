@@ -27,7 +27,6 @@ WriteMakefile1(
     },
     MAN1PODS            => {
       q{./bin/set_single_color} => q{blib/man1/set_single_color.1},
-      q{./bin/xcolor}           => q{blib/man1/xcolor.1},
     },
 
     MAN3PODS            => { },
