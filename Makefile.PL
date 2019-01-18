@@ -17,6 +17,7 @@ WriteMakefile1(
     ABSTRACT          => q{Get, set and modify X resources},
     VERSION_FROM      => q{./lib/Term/ExtendedColor/Xresources.pm},
     LICENSE           => q{perl},
+    MIN_PERL_VERSION  => 5.0060,
     EXE_FILES         => [
     glob('bin/*'),
     ],
